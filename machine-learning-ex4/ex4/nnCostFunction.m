@@ -100,7 +100,16 @@ J = J + (lambda * (sum(sum(Theta1_no_bias.^2)) + sum(sum(Theta2_no_bias.^2)))) /
 
 accum = 0;
 
+%%%%%pre-processing%%%%%%
+%matrix of single values 
 y_matrix = eye(num_labels)(y,:);
+
+%unbiased parameters
+Theta2_unbiased = Theta2(:,2:end);
+Theta1_unbiased = Theta1(:,2:end);
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%forward propagation 
 a_1_biased = X;
 a_1_unbiased = a_1_biased(:, 2:end);
 z_2 = a_1_biased * Theta1';
@@ -113,8 +122,42 @@ z_3 = a_2_biased * Theta2';
 
 a_3 = sigmoid(z_3);
 %size(a_3)
+%size(y_matrix)
+
+small_delta_3 = a_3 - y_matrix;
+
+%size(small_delta_3) 5000x10
 
 
+g_prime_z2 = sigmoidGradient(z2);
+%size(g_prime_z2) %5000x25
+
+small_delta_2 = (small_delta_3 * Theta2_unbiased) .* g_prime_z2;
+%size(small_delta_2) 5000x25 
+
+big_delta_2 = small_delta_3' * a_2_biased;
+%size(small_delta_3) 5000x10 
+%size(a_2_biased) 5000x26
+
+big_delta_1 = small_delta_2' * a_1_biased;
+%size(small_delta_2) 5000 x 25
+%size(a_1_biased) 5000 x 401
+
+%without regularization
+Theta1_grad = big_delta_1 / m; % 25 x 401
+Theta2_grad = big_delta_2 / m; % 10 x 26
+
+%Add regularization 
+regularized_1 = (lambda / m) * Theta1(:,2:end);
+regularized_1 = [zeros(size(Theta1,1),1) regularized_1];
+
+regularized_2 = (lambda / m) * Theta2(:,2:end);
+regularized_2 = [zeros(size(Theta2,1),1) regularized_2];
+
+Theta1_grad = Theta1_grad + regularized_1;
+Theta2_grad = Theta2_grad + regularized_2;
+
+%%%%%failed implementation
 %for t=1:m
 	
 	%step_1 
