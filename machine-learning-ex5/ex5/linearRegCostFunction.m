@@ -19,16 +19,12 @@ grad = zeros(size(theta));
 %               You should set J to the cost and grad to the gradient.
 %
 
+J = sum(((X * theta) - y).^2) / (2 * m) + lambda / (2 * m) * sum(theta(2:end,:).^2, 1);
 
-
-
-
-
-
-
-
-
-
+theta_reg = theta;
+theta_reg(1) = 0;
+grad = (sum(((X * theta) - y) .* X) / m)' + lambda * theta_reg / m;
+%sum will create a row vector >.>
 
 % =========================================================================
 
